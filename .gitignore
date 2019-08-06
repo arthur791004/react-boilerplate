@@ -1,0 +1,5 @@
+# default
+node_modules
+yarn-error.log
+build
+.vscode
