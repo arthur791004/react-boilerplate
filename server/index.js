@@ -1,10 +1,8 @@
-const path = require('path');
 const express = require('express');
+const { clientBuild, serverBuild } = require('./constants');
+const render = require('./render');
 
 const app = express();
-
-const rootFolder = process.cwd();
-const buildFolder = path.join(rootFolder, 'build', 'web');
 const host = '127.0.0.1';
 const port = 3000;
 
@@ -19,27 +17,38 @@ if (process.env.NODE_ENV !== 'production') {
   ] = require('../internals/webpack/dev.config');
   /* eslint-enable global-require, import/no-extraneous-dependencies */
 
-  const compiler = {
-    server: webpack(serverConfig),
-    client: webpack(clientConfig),
-  };
-
+  const compiler = webpack([clientConfig, serverConfig]);
+  const clientCompiler = compiler.compilers.find(
+    ({ name }) => name === 'client'
+  );
   const webpackDevMiddlewareOptions = {
     logLevel: 'error',
     publicPath: clientConfig.output.publicPath,
+    serverSideRender: true, // this feature is experimental
     watchOptions: {
       ignored: /node_modules/,
     },
+    writeToDisk: filePath => new RegExp(serverBuild).test(filePath),
   };
 
-  app.use(webpackDevMiddleware(compiler.client, webpackDevMiddlewareOptions));
-  app.use(webpackHotMiddleware(compiler.client));
+  app.use(webpackDevMiddleware(compiler, webpackDevMiddlewareOptions));
+
+  // only use clientCompiler, otherwise hot reload would fail
+  app.use(webpackHotMiddleware(clientCompiler));
 }
 
-app.use(express.static(buildFolder));
+app.use(express.static(clientBuild));
 
-app.get('*', (_, res) => {
-  res.sendFile(path.join(buildFolder, 'index.html'));
+app.get('*', (req, res) => {
+  const { url } = req;
+  const { webpackStats } = res.locals;
+  const config = {
+    webpackStats,
+    location: url,
+  };
+
+  res.set('content-type', 'text/html');
+  res.send(render(config));
 });
 
 app.listen(port, host, error => {

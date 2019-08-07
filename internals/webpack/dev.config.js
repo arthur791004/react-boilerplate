@@ -1,8 +1,11 @@
-const path = require('path');
 const webpack = require('webpack');
 
-const { rootFolder, targets } = require('./constants');
+const { targets } = require('./constants');
 const baseConfig = require('./base.config');
+
+const entries = {
+  web: ['webpack-hot-middleware/client'],
+};
 
 const plugins = [
   new webpack.NamedModulesPlugin(),
@@ -13,10 +16,7 @@ const getConfig = target =>
   baseConfig({
     target,
     mode: 'development',
-    entry: [
-      'webpack-hot-middleware/client',
-      path.join(rootFolder, 'client/index.js'),
-    ],
+    entry: entries[target],
     output: {
       filename: '[name].js',
       chunkFilename: '[name].chunk.js',

@@ -1,3 +1,5 @@
-import { lazy } from 'react';
+import loadable from '@loadable/component';
 
-export default lazy(() => import(/* webpackChunkName: "NotFoundPage" */ '.'));
+export default loadable(() =>
+  import(/* webpackChunkName: "NotFoundPage" */ '.')
+);

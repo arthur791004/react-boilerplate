@@ -1,52 +1,8 @@
 const path = require('path');
 const webpack = require('webpack');
-const nodeExternals = require('webpack-node-externals');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
+const LoadableWebpackPlugin = require('@loadable/webpack-plugin');
 
-const { publicPath, rootFolder } = require('./constants');
-
-const defaultEntry = ['react-hot-loader/patch'];
-
-const externals = {
-  node: [nodeExternals()],
-};
-
-const libraryTarget = {
-  node: 'commonjs2',
-};
-
-const defaultPlugins = [
-  new webpack.DefinePlugin({
-    'process.env': {
-      NODE_ENV: JSON.stringify(process.env.NODE_ENV),
-    },
-  }),
-  new HtmlWebpackPlugin({
-    template: 'client/html/index.html',
-    favicon: 'client/html/favicon.ico',
-    filename: 'index.html',
-    minify: {
-      removeComments: true,
-      collapseWhitespace: true,
-      removeRedundantAttributes: true,
-      useShortDoctype: true,
-      removeEmptyAttributes: true,
-      removeStyleLinkTypeAttributes: true,
-      keepClosingSlash: true,
-      minifyJS: true,
-      minifyCSS: true,
-      minifyURLs: true,
-    },
-  }),
-];
-
-const defaultOptimization = {
-  concatenateModules: true,
-  splitChunks: {
-    chunks: 'all',
-  },
-  runtimeChunk: 'single',
-};
+const { publicPath, rootFolder, defaultOptions } = require('./constants');
 
 const babelLoader = {
   loader: 'babel-loader',
@@ -71,55 +27,81 @@ const urlLoader = {
   },
 };
 
-const getDefaultOutput = target => ({
-  path: path.join(rootFolder, 'build', target),
-  publicPath,
-  libraryTarget: libraryTarget[target],
-});
-
 module.exports = ({
   mode,
-  entry,
-  output,
-  plugins,
-  optimization,
+  entry = [],
+  output = {},
+  plugins = [],
+  optimization = {},
   devtool,
   performance = {},
   target = 'web',
   ...options
-}) => ({
-  mode,
-  entry: defaultEntry.concat(entry),
-  output: Object.assign(getDefaultOutput(target), output),
-  module: {
-    rules: [
-      {
-        test: /\.js$/,
-        use: [babelLoader],
-      },
-      {
-        test: /\.svg$/,
-        issuer: {
-          test: /\.js$/,
-        },
-        use: [babelLoader, svgrLoader, urlLoader],
-      },
-      {
-        test: /\.html$/,
-        use: 'html-loader',
-      },
-    ],
-  },
-  plugins: plugins.concat(defaultPlugins),
-  optimization: Object.assign(defaultOptimization, optimization),
-  externals: externals[target],
-  devtool,
-  performance,
-  target,
-  resolve: {
-    alias: {
-      'react-dom': '@hot-loader/react-dom',
+}) => {
+  const {
+    name,
+    defaultEntry,
+    externals,
+    libraryTarget,
+    runtimeChunk,
+  } = defaultOptions[target];
+
+  return {
+    mode,
+    name,
+    entry: [...entry, ...defaultEntry],
+    output: {
+      path: path.join(rootFolder, 'build', target),
+      publicPath,
+      libraryTarget,
+      ...output,
     },
-  },
-  ...options,
-});
+    module: {
+      rules: [
+        {
+          test: /\.js$/,
+          use: [babelLoader],
+        },
+        {
+          test: /\.svg$/,
+          issuer: {
+            test: /\.js$/,
+          },
+          use: [babelLoader, svgrLoader, urlLoader],
+        },
+        {
+          test: /\.html$/,
+          use: 'html-loader',
+        },
+      ],
+    },
+    plugins: [
+      new webpack.DefinePlugin({
+        'process.env': {
+          NODE_ENV: JSON.stringify(process.env.NODE_ENV),
+          __SERVER__: target === 'node',
+        },
+      }),
+      new LoadableWebpackPlugin(),
+      ...plugins,
+    ],
+    optimization: {
+      concatenateModules: true,
+      splitChunks: {
+        chunks: 'all',
+      },
+      runtimeChunk,
+      ...optimization,
+    },
+    externals,
+    devtool,
+    performance,
+    target,
+    resolve: {
+      alias: {
+        'react-dom': '@hot-loader/react-dom',
+      },
+    },
+    ...options,
+  };
+};
