@@ -17,6 +17,7 @@ module.exports = {
     ],
     '@babel/plugin-proposal-object-rest-spread',
     'babel-plugin-styled-components',
-    'react-hot-loader/babel',
+    // FIXME: Cannot read property 'signature' of undefined
+    // 'react-hot-loader/babel',
   ],
 };
