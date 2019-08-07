@@ -2,11 +2,17 @@ const path = require('path');
 const webpack = require('webpack');
 
 const rootFolder = process.cwd();
-const plugins = [new webpack.NamedModulesPlugin()];
+const plugins = [
+  new webpack.NamedModulesPlugin(),
+  new webpack.HotModuleReplacementPlugin(),
+];
 
 module.exports = require('./base.config')({
   mode: 'development',
-  entry: [path.join(rootFolder, 'client/index.js')],
+  entry: [
+    'webpack-hot-middleware/client',
+    path.join(rootFolder, 'client/index.js'),
+  ],
   output: {
     filename: '[name].js',
     chunkFilename: '[name].chunk.js',
@@ -19,12 +25,4 @@ module.exports = require('./base.config')({
     hints: false,
   },
   devtool: 'cheap-module-source-map',
-  devServer: {
-    contentBase: path.join(rootFolder, 'build'),
-    compress: true,
-    port: 3000,
-    hot: true,
-    open: true,
-    historyApiFallback: true,
-  },
 });
