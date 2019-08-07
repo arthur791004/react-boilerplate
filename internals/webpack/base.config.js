@@ -1,14 +1,18 @@
 const path = require('path');
 const webpack = require('webpack');
+const nodeExternals = require('webpack-node-externals');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
-const rootFolder = process.cwd();
+const { publicPath, rootFolder } = require('./constants');
 
 const defaultEntry = ['react-hot-loader/patch'];
 
-const defaultOutput = {
-  path: path.join(rootFolder, 'build'),
-  publicPath: '/',
+const externals = {
+  node: [nodeExternals()],
+};
+
+const libraryTarget = {
+  node: 'commonjs2',
 };
 
 const defaultPlugins = [
@@ -67,6 +71,12 @@ const urlLoader = {
   },
 };
 
+const getDefaultOutput = target => ({
+  path: path.join(rootFolder, 'build', target),
+  publicPath,
+  libraryTarget: libraryTarget[target],
+});
+
 module.exports = ({
   mode,
   entry,
@@ -80,7 +90,7 @@ module.exports = ({
 }) => ({
   mode,
   entry: defaultEntry.concat(entry),
-  output: Object.assign(defaultOutput, output),
+  output: Object.assign(getDefaultOutput(target), output),
   module: {
     rules: [
       {
@@ -102,6 +112,7 @@ module.exports = ({
   },
   plugins: plugins.concat(defaultPlugins),
   optimization: Object.assign(defaultOptimization, optimization),
+  externals: externals[target],
   devtool,
   performance,
   target,

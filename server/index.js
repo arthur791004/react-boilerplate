@@ -4,7 +4,7 @@ const express = require('express');
 const app = express();
 
 const rootFolder = process.cwd();
-const buildFolder = path.join(rootFolder, 'build');
+const buildFolder = path.join(rootFolder, 'build', 'web');
 const host = '127.0.0.1';
 const port = 3000;
 
@@ -13,20 +13,27 @@ if (process.env.NODE_ENV !== 'production') {
   const webpack = require('webpack');
   const webpackDevMiddleware = require('webpack-dev-middleware');
   const webpackHotMiddleware = require('webpack-hot-middleware');
-  const webpackConfig = require('../internals/webpack/dev.config');
+  const [
+    clientConfig,
+    serverConfig,
+  ] = require('../internals/webpack/dev.config');
   /* eslint-enable global-require, import/no-extraneous-dependencies */
 
-  const compiler = webpack(webpackConfig);
-  const options = {
+  const compiler = {
+    server: webpack(serverConfig),
+    client: webpack(clientConfig),
+  };
+
+  const webpackDevMiddlewareOptions = {
     logLevel: 'error',
-    publicPath: webpackConfig.output.publicPath,
+    publicPath: clientConfig.output.publicPath,
     watchOptions: {
       ignored: /node_modules/,
     },
   };
 
-  app.use(webpackDevMiddleware(compiler, options));
-  app.use(webpackHotMiddleware(compiler));
+  app.use(webpackDevMiddleware(compiler.client, webpackDevMiddlewareOptions));
+  app.use(webpackHotMiddleware(compiler.client));
 }
 
 app.use(express.static(buildFolder));
