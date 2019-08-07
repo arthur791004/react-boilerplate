@@ -42,13 +42,19 @@ app.use(express.static(clientBuild));
 app.get('*', (req, res) => {
   const { url } = req;
   const { webpackStats } = res.locals;
-  const config = {
+  const context = {};
+  const html = render({
     webpackStats,
     location: url,
-  };
+    context,
+  });
 
-  res.set('content-type', 'text/html');
-  res.send(render(config));
+  if (context.url) {
+    res.redirect(context.url);
+  } else {
+    res.set('content-type', 'text/html');
+    res.send(html);
+  }
 });
 
 app.listen(port, host, error => {
