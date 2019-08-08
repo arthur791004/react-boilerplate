@@ -1,4 +1,5 @@
 const express = require('express');
+const compression = require('compression');
 const { clientBuild } = require('./constants');
 const render = require('./render').default;
 const addDevServer = require('./middlewares/addDevServer');
@@ -7,6 +8,7 @@ const app = express();
 const host = '127.0.0.1';
 const port = 3000;
 
+app.use(compression());
 app.use(express.static(clientBuild));
 
 if (process.env.NODE_ENV !== 'production') {
