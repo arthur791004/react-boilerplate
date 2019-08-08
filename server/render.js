@@ -37,28 +37,13 @@ const render = config => {
 
   sheet.seal();
 
-  return `
-<!DOCTYPE html>
-<html lang="${lang}">
-  <head>
-    <meta charset="utf-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1, shrink-to-fit=no"
-    />
-    <meta name="theme-color" content="#000000" />
-    <title>React Boilerplate</title>
-    <link rel="shortcut icon" href="/favicon.ico">
-    ${links}
-    ${styles}
-  </head>
-  <body>
-    <noscript>You need to enable JavaScript to run this app.</noscript>
-    <div id="root">${app}</div>
-    ${scripts}
-  </body>
-</html>
-`;
+  return {
+    app,
+    lang,
+    links,
+    scripts,
+    styles,
+  };
 };
 
 export default render;

@@ -1,5 +1,7 @@
+const path = require('path');
 const express = require('express');
 const compression = require('compression');
+const exphbs = require('express-handlebars');
 const { clientBuild } = require('./constants');
 const render = require('./render').default;
 const addDevServer = require('./middlewares/addDevServer');
@@ -10,6 +12,9 @@ const port = 3000;
 
 app.use(compression());
 app.use(express.static(clientBuild));
+app.engine('hbs', exphbs({ extname: '.hbs', defaultLayout: false }));
+app.set('view engine', 'hbs');
+app.set('views', path.resolve(__dirname, './views'));
 
 if (process.env.NODE_ENV !== 'production') {
   addDevServer(app);
@@ -18,7 +23,7 @@ if (process.env.NODE_ENV !== 'production') {
 app.get('*', (req, res) => {
   const { url } = req;
   const context = {};
-  const html = render({
+  const renderOptions = render({
     location: url,
     context,
   });
@@ -26,8 +31,7 @@ app.get('*', (req, res) => {
   if (context.url) {
     res.redirect(context.url);
   } else {
-    res.set('content-type', 'text/html');
-    res.send(html);
+    res.render('index', renderOptions);
   }
 });
 
