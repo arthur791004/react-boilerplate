@@ -29,33 +29,34 @@ const urlLoader = {
 
 module.exports = ({
   mode,
+  name,
   entry = [],
   output = {},
   plugins = [],
   optimization = {},
   devtool,
   performance = {},
-  target = 'web',
   ...options
 }) => {
   const {
-    name,
-    defaultEntry,
+    entry: defaultEntry,
+    output: defaultOutput,
+    node,
     externals,
-    libraryTarget,
-    runtimeChunk,
-  } = defaultOptions[target];
+    target,
+  } = defaultOptions[name];
 
   return {
     mode,
     name,
     entry: [...entry, ...defaultEntry],
     output: {
-      path: path.join(rootFolder, 'build', target),
+      path: path.join(rootFolder, 'build', name),
       publicPath,
-      libraryTarget,
+      ...defaultOutput,
       ...output,
     },
+    node,
     module: {
       rules: [
         {
@@ -79,7 +80,7 @@ module.exports = ({
       new webpack.DefinePlugin({
         'process.env': {
           NODE_ENV: JSON.stringify(process.env.NODE_ENV),
-          __SERVER__: target === 'node',
+          IS_SERVER: name === 'server',
         },
       }),
       new LoadableWebpackPlugin(),
@@ -90,7 +91,6 @@ module.exports = ({
       splitChunks: {
         chunks: 'all',
       },
-      runtimeChunk,
       ...optimization,
     },
     externals,

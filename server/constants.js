@@ -1,11 +1,18 @@
 const path = require('path');
-const { rootFolder, targets } = require('../internals/webpack/constants');
+const { rootFolder, names } = require('../internals/webpack/constants');
 
-const [clientBuild, serverBuild] = targets.map(target =>
-  path.join(rootFolder, 'build', target)
+const [clientBuild, serverBuild] = names.map(name =>
+  path.join(rootFolder, 'build', name)
 );
+
+const statsFilename = 'loadable-stats.json';
+const clientStatsFile = path.join(clientBuild, statsFilename);
+const serverStatsFile = path.join(serverBuild, statsFilename);
 
 module.exports = {
   clientBuild,
   serverBuild,
+  statsFilename,
+  clientStatsFile,
+  serverStatsFile,
 };

@@ -1,10 +1,16 @@
+const path = require('path');
 const webpack = require('webpack');
 
-const { targets } = require('./constants');
+const { names, rootFolder } = require('./constants');
 const baseConfig = require('./base.config');
 
-const entries = {
-  web: ['webpack-hot-middleware/client'],
+const options = {
+  server: {
+    entry: [path.join(rootFolder, 'client/App.js')],
+  },
+  client: {
+    entry: ['webpack-hot-middleware/client'],
+  },
 };
 
 const plugins = [
@@ -12,11 +18,11 @@ const plugins = [
   new webpack.HotModuleReplacementPlugin(),
 ];
 
-const getConfig = target =>
+const getConfig = (name, { entry }) =>
   baseConfig({
-    target,
+    name,
     mode: 'development',
-    entry: entries[target],
+    entry,
     output: {
       filename: '[name].js',
       chunkFilename: '[name].chunk.js',
@@ -31,4 +37,4 @@ const getConfig = target =>
     devtool: 'cheap-module-source-map',
   });
 
-module.exports = targets.map(target => getConfig(target));
+module.exports = names.map(name => getConfig(name, options[name]));

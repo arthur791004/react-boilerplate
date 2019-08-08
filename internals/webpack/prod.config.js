@@ -1,19 +1,34 @@
+const path = require('path');
 const webpack = require('webpack');
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 
-const { targets } = require('./constants');
+const { names, rootFolder } = require('./constants');
 const baseConfig = require('./base.config');
 
-const plugins = [new webpack.HashedModuleIdsPlugin()];
-
-const getConfig = target =>
-  baseConfig({
-    target,
-    mode: 'production',
+const options = {
+  server: {
+    entry: [path.join(rootFolder, 'server/index.js')],
+    output: {
+      filename: 'index.js',
+      chunkFilename: '[name].chunk.js',
+    },
+  },
+  client: {
     output: {
       filename: '[name].[chunkhash].js',
       chunkFilename: '[name].[chunkhash].chunk.js',
     },
+  },
+};
+
+const plugins = [new webpack.HashedModuleIdsPlugin()];
+
+const getConfig = (name, { entry, output }) =>
+  baseConfig({
+    name,
+    mode: 'production',
+    entry,
+    output,
     plugins,
     optimization: {
       minimizer: [
@@ -25,4 +40,4 @@ const getConfig = target =>
     },
   });
 
-module.exports = targets.map(target => getConfig(target));
+module.exports = names.map(name => getConfig(name, options[name]));

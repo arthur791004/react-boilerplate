@@ -1,8 +1,9 @@
 import React from 'react';
 import { renderToString } from 'react-dom/server';
 import { StaticRouter } from 'react-router-dom';
-import { ChunkExtractor } from '@loadable/server';
+import { ChunkExtractor, ChunkExtractorManager } from '@loadable/server';
 import { ServerStyleSheet, StyleSheetManager } from 'styled-components';
+import { serverStatsFile, clientStatsFile } from './constants';
 
 const defaultConfig = {
   lang: 'zh-TW',
@@ -10,28 +11,28 @@ const defaultConfig = {
   context: {},
 };
 
+const getApp = () =>
+  process.env.NODE_ENV === 'production'
+    ? require('@/App')
+    : new ChunkExtractor({ statsFile: serverStatsFile }).requireEntrypoint();
+
 const render = config => {
-  const { lang, location, context, webpackStats } = Object.assign(
-    {},
-    defaultConfig,
-    config
-  );
-  const [clientStats, serverStats] = webpackStats.stats;
-  const serverExtractor = new ChunkExtractor({ stats: serverStats.toJson() });
-  const clientExtractor = new ChunkExtractor({ stats: clientStats.toJson() });
-  const App = serverExtractor.requireEntrypoint().default;
+  const { lang, location, context } = Object.assign({}, defaultConfig, config);
+  const extractor = new ChunkExtractor({ statsFile: clientStatsFile });
+  const App = getApp().default;
   const sheet = new ServerStyleSheet();
-  const app = clientExtractor.collectChunks(
-    <StaticRouter location={location} context={context}>
-      <StyleSheetManager sheet={sheet.instance}>
-        <App />
-      </StyleSheetManager>
-    </StaticRouter>
+  const app = renderToString(
+    <ChunkExtractorManager extractor={extractor}>
+      <StaticRouter location={location} context={context}>
+        <StyleSheetManager sheet={sheet.instance}>
+          <App />
+        </StyleSheetManager>
+      </StaticRouter>
+    </ChunkExtractorManager>
   );
 
-  const html = renderToString(app);
-  const links = clientExtractor.getLinkTags();
-  const scripts = clientExtractor.getScriptTags();
+  const links = extractor.getLinkTags();
+  const scripts = extractor.getScriptTags();
   const styles = sheet.getStyleTags();
 
   sheet.seal();
@@ -53,11 +54,11 @@ const render = config => {
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
-    <div id="root">${html}</div>
+    <div id="root">${app}</div>
     ${scripts}
   </body>
 </html>
 `;
 };
 
-module.exports = render;
+export default render;

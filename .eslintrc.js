@@ -16,6 +16,7 @@ const config = {
   },
   plugins: ['react', 'react-hooks'],
   rules: {
+    'global-require': 0,
     'import/no-extraneous-dependencies': [
       'error',
       {

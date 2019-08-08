@@ -1,6 +1,6 @@
 const express = require('express');
-const { clientBuild, serverBuild } = require('./constants');
-const render = require('./render');
+const { clientBuild, serverBuild, statsFilename } = require('./constants');
+const render = require('./render').default;
 
 const app = express();
 const host = '127.0.0.1';
@@ -24,11 +24,12 @@ if (process.env.NODE_ENV !== 'production') {
   const webpackDevMiddlewareOptions = {
     logLevel: 'error',
     publicPath: clientConfig.output.publicPath,
-    serverSideRender: true, // this feature is experimental
     watchOptions: {
       ignored: /node_modules/,
     },
-    writeToDisk: filePath => new RegExp(serverBuild).test(filePath),
+    writeToDisk: filePath =>
+      new RegExp(serverBuild).test(filePath) ||
+      new RegExp(statsFilename).test(filePath),
   };
 
   app.use(webpackDevMiddleware(compiler, webpackDevMiddlewareOptions));
@@ -41,10 +42,8 @@ app.use(express.static(clientBuild));
 
 app.get('*', (req, res) => {
   const { url } = req;
-  const { webpackStats } = res.locals;
   const context = {};
   const html = render({
-    webpackStats,
     location: url,
     context,
   });
