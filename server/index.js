@@ -2,7 +2,7 @@ const path = require('path');
 const express = require('express');
 const compression = require('compression');
 const exphbs = require('express-handlebars');
-const { clientBuild } = require('./constants');
+const { clientBuild } = require('../internals/webpack/constants');
 const render = require('./render').default;
 const addDevServer = require('./middlewares/addDevServer');
 

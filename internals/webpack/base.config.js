@@ -41,6 +41,7 @@ module.exports = ({
   const {
     entry: defaultEntry,
     output: defaultOutput,
+    plugins: defaultPlugins,
     node,
     externals,
     target,
@@ -84,6 +85,7 @@ module.exports = ({
         },
       }),
       new LoadableWebpackPlugin(),
+      ...defaultPlugins,
       ...plugins,
     ],
     optimization: {
