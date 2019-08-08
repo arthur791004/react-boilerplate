@@ -1,14 +1,15 @@
+require('dotenv').config();
+
 const path = require('path');
 const express = require('express');
 const compression = require('compression');
 const exphbs = require('express-handlebars');
 const { clientBuild } = require('../internals/webpack/constants');
+const { host, port } = require('./config');
 const render = require('./render').default;
 const addDevServer = require('./middlewares/addDevServer');
 
 const app = express();
-const host = '127.0.0.1';
-const port = 3000;
 
 app.use(compression());
 app.use(express.static(clientBuild));
