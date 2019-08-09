@@ -3,6 +3,7 @@ const config = {
   parser: 'babel-eslint',
   env: {
     es6: true,
+    jest: true,
   },
   globals: {
     document: true,
