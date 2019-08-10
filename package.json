@@ -7,8 +7,9 @@
     "node": "10.16.0"
   },
   "scripts": {
-    "start": "webpack-dev-server --config ./internals/webpack/dev.config.js",
-    "start:prod": "node server",
+    "prestart": "yarn run build:clean",
+    "start": "cross-env NODE_ENV=development babel-node server",
+    "start:prod": "cross-env NODE_ENV=production node build/server",
     "prod": "yarn run start:prod",
     "prebuild": "yarn run build:clean",
     "build": "cross-env NODE_ENV=production webpack --config ./internals/webpack/prod.config.js",
@@ -26,20 +27,29 @@
   "private": true,
   "dependencies": {
     "@hot-loader/react-dom": "~16.8.6",
+    "@loadable/component": "~5.10.2",
+    "@loadable/server": "~5.10.2",
+    "compression": "~1.7.4",
+    "dotenv": "~8.0.0",
     "express": "~4.17.1",
+    "express-handlebars": "~3.1.0",
     "prop-types": "~15.7.2",
     "react": "~16.8.6",
     "react-dom": "~16.8.6",
     "react-hot-loader": "~4.12.10",
     "react-router-dom": "~5.0.1",
-    "styled-components": "~4.3.2"
+    "styled-components": "~4.3.2",
+    "webpack-hot-middleware": "~2.25.0"
   },
   "devDependencies": {
     "@babel/core": "~7.5.4",
+    "@babel/node": "~7.5.5",
     "@babel/plugin-proposal-class-properties": "~7.5.0",
     "@babel/plugin-proposal-object-rest-spread": "~7.5.4",
     "@babel/preset-env": "~7.5.4",
     "@babel/preset-react": "~7.0.0",
+    "@loadable/babel-plugin": "~5.10.0",
+    "@loadable/webpack-plugin": "~5.7.1",
     "@storybook/addon-knobs": "~5.1.9",
     "@storybook/addon-viewport": "~5.1.9",
     "@storybook/addons": "^5.1.9",
@@ -50,6 +60,7 @@
     "babel-loader": "~8.0.6",
     "babel-plugin-module-resolver": "~3.2.0",
     "babel-plugin-styled-components": "~1.10.6",
+    "copy-webpack-plugin": "~5.0.4",
     "cross-env": "~5.2.0",
     "eslint": "~6.5.1",
     "eslint-config-airbnb": "~17.1.1",
@@ -60,7 +71,6 @@
     "eslint-plugin-react": "~7.14.2",
     "eslint-plugin-react-hooks": "~1.6.1",
     "html-loader": "~0.5.5",
-    "html-webpack-plugin": "~3.2.0",
     "husky": "~3.0.2",
     "jest": "~24.8.0",
     "lint-staged": "~9.2.0",
@@ -70,6 +80,7 @@
     "url-loader": "~2.0.1",
     "webpack": "~4.35.3",
     "webpack-cli": "~3.3.5",
-    "webpack-dev-server": "~3.7.2"
+    "webpack-dev-middleware": "~3.7.0",
+    "webpack-node-externals": "~1.7.2"
   }
 }

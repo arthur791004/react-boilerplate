@@ -1,11 +1,19 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { hydrate } from 'react-dom';
+import { BrowserRouter } from 'react-router-dom';
+
+import { loadableReady } from '@loadable/component';
 
 import App from './App';
 
 const container = document.getElementById('root');
-const render = () => {
-  ReactDOM.render(<App />, container);
-};
 
-render();
+loadableReady(() => {
+  const app = (
+    <BrowserRouter>
+      <App />
+    </BrowserRouter>
+  );
+
+  hydrate(app, container);
+});

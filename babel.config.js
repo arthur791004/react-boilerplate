@@ -17,6 +17,7 @@ module.exports = {
     ],
     '@babel/plugin-proposal-object-rest-spread',
     'babel-plugin-styled-components',
+    '@loadable/babel-plugin',
     'react-hot-loader/babel',
   ],
 };
