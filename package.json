@@ -26,6 +26,7 @@
   "private": true,
   "dependencies": {
     "@hot-loader/react-dom": "~16.8.6",
+    "dotenv": "~8.1.0",
     "express": "~4.17.1",
     "prop-types": "~15.7.2",
     "react": "~16.8.6",

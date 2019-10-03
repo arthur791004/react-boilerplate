@@ -1,12 +1,11 @@
+require('dotenv').config();
+
 const path = require('path');
 const express = require('express');
-const { buildPath } = require('./constants');
+const { buildPath, host, port } = require('./constants');
 const addDevServer = require('./middlewares/addDevServer');
 
 const app = express();
-
-const host = '127.0.0.1';
-const port = 3000;
 
 if (process.env.NODE_ENV !== 'production') {
   addDevServer(app);
