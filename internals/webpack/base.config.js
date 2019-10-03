@@ -1,14 +1,12 @@
-const path = require('path');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-
-const rootFolder = process.cwd();
+const { buildPath, publicPath } = require('../../server/constants');
 
 const defaultEntry = ['react-hot-loader/patch'];
 
 const defaultOutput = {
-  path: path.join(rootFolder, 'build'),
-  publicPath: '/',
+  path: buildPath,
+  publicPath,
 };
 
 const defaultPlugins = [

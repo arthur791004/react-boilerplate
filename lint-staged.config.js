@@ -2,7 +2,7 @@ const config = {
   '*.js': [
     // use prettier to make consistent styles
     'prettier --write',
-    'yarn run lint-eslint --fix',
+    'yarn run lint:eslint --fix',
     'git add',
   ],
 };
